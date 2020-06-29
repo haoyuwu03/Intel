@@ -1,0 +1,35 @@
+#In work...
+
+#Google Colab Only..
+%tensorflow_version 2.x
+
+#Import the Fecessary Files
+import tensorflow as tf
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import os
+import cv2
+
+#Connects with Google Drive (For Google Colab ONLY)
+from google.colab import drive
+drive.mount('/content/drive')
+
+#Loads Data From Google Drive
+training_path = '/content/drive/My Drive/Data/Eyes/diabetic_rectinopathy_training'
+os.chdir(training_path)
+os.getcwd()
+files_training = os.listdir(training_path)
+
+#Creates Arrays That Will Contain the Files and Their Labels
+categories = []
+files_names = []
+
+#sorts the files so that they match a corresponding label
+for filename in files_training:
+  if filename[22:23] == "0":
+    categories.append("healthy eye")
+    files_names.append(filename)
+
+print(categories)
+print(files_names)
