@@ -6,6 +6,7 @@ import os
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
+from PIL import Image
 
 #Define prediction classes
 class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
@@ -13,14 +14,16 @@ class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
 
 #Function to turn image into input array
 def preprocess(image_path):
-    image = keras.preprocessing.image.load_img(image_path, grayscale=True)
+    image= keras.preprocessing.image.load_img(image_path)
     input_arr = keras.preprocessing.image.img_to_array(image)
-    new_arr = np.resize(input_arr, (28,28))
+    print(input_arr[20])
+    new_arr = np.resize(input_arr, (28,28)) #make same size as training images
     new_arr = np.array([new_arr])  # Convert single image to a batch.
     return new_arr
 
 #Create input array
-img = preprocess('C:/Users/ticto/Documents/Programming Projects/Intel/image/pants.jpg')
+img = preprocess('C:/Users/ticto/Documents/Programming Projects/Intel/image/shirtwperson.jpg')
+
 
 #Load model
 model = tf.keras.models.load_model("clothesClassifier.model")
@@ -29,4 +32,4 @@ model = tf.keras.models.load_model("clothesClassifier.model")
 predictions = model.predict(img)
 
 #Round prediction to closest class and print string class name
-print(np.argmax(predictions[0]))
+print(class_names[np.argmax(predictions[0])])
