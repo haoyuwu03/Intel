@@ -1,35 +1,74 @@
 #In work...
 
-#Google Colab Only..
-%tensorflow_version 2.x
-
-#Import the Fecessary Files
-import tensorflow as tf
-import matplotlib.pyplot as plt
+# To add a new cell, type '# %%'
+# To add a new markdown cell, type '# %% [markdown]'
+# %%   <-- is use with jupyter notebook in visual studio code
+#imports
+import tensorflow as tf 
 import numpy as np
 import pandas as pd
-import os
+import matplotlib.pyplot as plt
+import os 
+import io
 import cv2
+import csv
+import skimage.io
 
-#Connects with Google Drive (For Google Colab ONLY)
-from google.colab import drive
-drive.mount('/content/drive')
 
-#Loads Data From Google Drive
-training_path = '/content/drive/My Drive/Data/Eyes/diabetic_rectinopathy_training'
-os.chdir(training_path)
-os.getcwd()
-files_training = os.listdir(training_path)
+# %%
+#path to the training file
+data_directory = "D:/d_retinopathy_training/"
+files_training = os.listdir(data_directory)
 
-#Creates Arrays That Will Contain the Files and Their Labels
+
+# %%
+#file name and category matrix
 categories = []
-files_names = []
+file_names = []
 
-#sorts the files so that they match a corresponding label
+#adds file name to category
 for filename in files_training:
   if filename[22:23] == "0":
     categories.append("healthy eye")
-    files_names.append(filename)
+    file_names.append(filename)
+  if filename[22:23] == "1":
+    categories.append("diabetic rectinopathy stage 1")
+    file_names.append(filename)
+  if filename[22:23] == "2":
+    categories.append("diabetic rectinopathy stage 2")
+    file_names.append(filename)
+  if filename[22:23] == "3":
+    categories.append("diabetic rectinopathy stage 3")
+    file_names.append(filename)
+  if filename[22:23] == "4":
+    categories.append("diabetic rectinopathy stage 4")
+    file_names.append(filename)
 
-print(categories)
-print(files_names)
+#combines matrix in a dataframe
+data = pd.DataFrame({
+    'filename' : file_names,
+    'label' : categories,
+})
+
+
+# %%
+#plots the data being used
+data['label'].value_counts().plot.bar()
+print(data['label'].value_counts())
+
+
+# %%
+#visualize images, our images are BGR images (the diabetic rectinopathy ones, so colors will be flipped when being read using cv2.imread, idk if this will have a difference)
+for img in os.listdir(data_directory):
+    img_array = cv2.imread(os.path.join(data_directory,img),cv2.IMREAD_GRAYSCALE)
+    plt.imshow(img_array)
+    
+    plt.show()
+    print(img)
+
+
+# %%
+IMG_SIZE = 150
+new_array = cv2.resize(img_array, (IMG_SIZE, IMG_SIZE))
+plt.imshow(new_array, cmap='gray')
+plt.show()
