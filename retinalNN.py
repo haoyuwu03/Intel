@@ -18,38 +18,39 @@ files_training = os.listdir(data_directory)
 
 # %%
 #file name and category matrix
-categories = []
+categories = ["healthy eye", "diabetic rectinopathy stage 1", "diabetic rectinopathy stage 2", "diabetic rectinopathy stage 3", "diabetic rectinopathy stage 4"]
 file_names = []
+labels = []
+IMG_SIZE = 150
 
 #adds file name to category
 for filename in files_training:
   if filename[22:23] == "0":
-    categories.append("healthy eye")
+    labels.append(0)
     file_names.append(filename)
   if filename[22:23] == "1":
-    categories.append("diabetic rectinopathy stage 1")
+    labels.append(1)
     file_names.append(filename)
   if filename[22:23] == "2":
-    categories.append("diabetic rectinopathy stage 2")
+    labels.append(2)
     file_names.append(filename)
   if filename[22:23] == "3":
-    categories.append("diabetic rectinopathy stage 3")
+    labels.append(3)
     file_names.append(filename)
   if filename[22:23] == "4":
-    categories.append("diabetic rectinopathy stage 4")
+    labels.append(4)
     file_names.append(filename)
 
 #combines matrix in a dataframe
 data = pd.DataFrame({
     'filename' : file_names,
-    'label' : categories,
+    'label' : labels,
 })
-
 
 # %%
 #plots the data being used
-data['label'].value_counts().plot.bar()
-print(data['label'].value_counts())
+#data['label'].value_counts().plot.bar()
+#print(data['label'].value_counts())
 
 #Crop image
 def crop_image_from_gray(img,tol=7):
@@ -73,28 +74,22 @@ def crop_image_from_gray(img,tol=7):
         return img
 
 #Enhance colors and add halo around eye
-def color_crop_enhance(path, img_size, sigmaX=10):
+def color_crop_enhance(path, sigmaX=10):
 
     image = cv2.imread(path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = crop_image_from_gray(image)
-    image = cv2.resize(image, (img_size, img_size))
+    image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
     image = cv2.addWeighted(image, 4, cv2.GaussianBlur(image, (0,0), sigmaX),-4,128)
     return image
 
-# %%
-#visualize images, our images are BGR images (the diabetic rectinopathy ones, so colors will be flipped when being read using cv2.imread, idk if this will have a difference)
-IMG_SIZE = 150
-
-#Train images array
-train_images = []
-for img in os.listdir(data_directory):
-    image = color_crop_enhance(os.path.join(data_directory,img), IMG_SIZE)
-    train_images.append(image)
-    #img_array = cv2.imread(os.path.join(data_directory,img),cv2.IMREAD_GRAYSCALE)
-    
-    #plt.show()
-    #print(img)
+#Create training list of image arrays
+def create_train_data(folder_path):
+    train_data = []
+    for img in os.listdir(folder_path):
+        image = color_crop_enhance(os.path.join(folder_path,img))
+        train_data.append(image)
+    return train_data
 
 #Display 10 images
 def plotImages(images_arr):
@@ -106,23 +101,22 @@ def plotImages(images_arr):
     plt.tight_layout()
     plt.show()
 
-#plotImages(train_images)
+#Scale pixel values
+def scale(images_arr, scalar):
+    for image in images_arr:
+        for column in image:
+            for row in column:
+                for pixel in row:
+                    pixel = pixel / scalar
 
-#Turn images into array
-train_data = []
-for image in train_images:
-    train_data.append(tf.keras.preprocessing.image.img_to_array(image))
-#print(train_data)
+#Create training list of image arrays
+train_images = create_train_data(data_directory)
 
 #Scale pixel values
-for image in train_data:
-    for column in image:
-        for row in column:
-            for pixel in row:
-                pixel = pixel / 255.0
+train_images = scale(train_images, 255)
 
 #Create array of training labels
-train_labels = data['label']
+train_labels = np.array(data['label'])
 
 #Build Model
 model = keras.Sequential([
@@ -138,7 +132,7 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 #Train Model
-model.fit(train_data, train_labels, epochs=10)
+model.fit(train_images, train_labels, epochs=10)
 
 #ADD TEST DATA TO EVALUATE MODEL ON!!!
 
