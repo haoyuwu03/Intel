@@ -1,5 +1,3 @@
-#NOTE: the process of creating training data needs to be fixed- it created a (150, 3) shaped array instead of a (150, 150) one. Look into feeding preprocessed images of type PIL into a Keras ImageDataGenerator
-
 #imports
 import tensorflow as tf 
 from tensorflow import keras
