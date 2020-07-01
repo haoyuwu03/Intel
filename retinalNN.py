@@ -80,14 +80,6 @@ def color_crop_enhance(path, sigmaX=10):
     image = cv2.addWeighted(image, 4, cv2.GaussianBlur(image, (0,0), sigmaX),-4,128)
     return image
 
-#Create training list of image arrays
-def create_train_data(folder_path):
-    train_data = []
-    for img in os.listdir(folder_path):
-        image = color_crop_enhance(os.path.join(folder_path,img))
-        train_data.append(image)
-    return np.array(train_data)
-
 #Display 10 images
 def plotImages(images_arr):
     fig, axes = plt.subplots(2, 5, figsize=(20,20))
