@@ -75,7 +75,6 @@ def crop_image_from_gray(img,tol=7):
 
 #Enhance colors and add halo around eye
 def color_crop_enhance(path, sigmaX=10):
-
     image = cv2.imread(path)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image = crop_image_from_gray(image)
@@ -89,7 +88,7 @@ def create_train_data(folder_path):
     for img in os.listdir(folder_path):
         image = color_crop_enhance(os.path.join(folder_path,img))
         train_data.append(image)
-    return train_data
+    return np.array(train_data)
 
 #Display 10 images
 def plotImages(images_arr):
@@ -101,28 +100,35 @@ def plotImages(images_arr):
     plt.tight_layout()
     plt.show()
 
-#Scale pixel values
-def scale(images_arr, scalar):
-    for image in images_arr:
-        for column in image:
-            for row in column:
-                for pixel in row:
-                    pixel = pixel / scalar
-
 #Create training list of image arrays
-train_images = create_train_data(data_directory)
+def create_input_data(folder_path):
+    train_data = []
+    for img in os.listdir(data_directory):
+        image = color_crop_enhance(os.path.join(data_directory,img))
+        train_data.append(image)
+    return np.array(train_data).reshape(-1, IMG_SIZE, IMG_SIZE, 3)
+
+train_images = create_input_data(data_directory)
 
 #Scale pixel values
-train_images = scale(train_images, 255)
+train_images = train_images / 255.0
 
 #Create array of training labels
 train_labels = np.array(data['label'])
 
 #Build Model
-model = keras.Sequential([
-    keras.layers.Flatten(input_shape=(150, 3)), #turns 2d array to 1d
-    keras.layers.Dense(128, activation='relu'), #every node connected to next
-    keras.layers.Dense(3), #Each output node is score of input belonging to one of the 3 classes
+model = keras.models.Sequential([
+    keras.layers.Conv2D(16, 3, padding='same', activation='relu', input_shape=train_images.shape[1:]),
+    keras.layers.MaxPooling2D(),
+    keras.layers.Dropout(0.2),
+    keras.layers.Conv2D(32, 3, padding='same', activation='relu'),
+    keras.layers.MaxPooling2D(),
+    keras.layers.Dropout(0.2),
+    keras.layers.Conv2D(64, 3, padding='same', activation='relu'),
+    keras.layers.MaxPooling2D(),
+    keras.layers.Flatten(),
+    keras.layers.Dense(512, activation='relu'),
+    keras.layers.Dense(3), #Each output node is a score of the three classes
     keras.layers.Softmax()
 ])
 
@@ -132,7 +138,7 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 #Train Model
-model.fit(train_images, train_labels, epochs=10)
+model.fit(train_images, train_labels, batch_size=2, epochs=3)
 
 #ADD TEST DATA TO EVALUATE MODEL ON!!!
 
