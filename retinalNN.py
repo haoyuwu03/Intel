@@ -7,37 +7,48 @@ import matplotlib.pyplot as plt
 import os 
 import io
 import cv2
+from cv2 import cv2 #only on visual studio code
 import csv
 import skimage.io
 
 #path to the training file
-data_directory = "C:/Users/ticto/Documents/Programming Projects/Intel/RetinopathyImages/labeled_train"
+data_directory = "D:\d_retinopathy_training" #"C:/Users/ticto/Documents/Programming Projects/Intel/RetinopathyImages/labeled_train"
 files_training = os.listdir(data_directory)
 
-# %%
 #file name and category matrix
-categories = ["healthy eye", "diabetic rectinopathy stage 1", "diabetic rectinopathy stage 2", "diabetic rectinopathy stage 3", "diabetic rectinopathy stage 4"]
+categories = ["healthy eye", "diabetic rectinopathy stage 1", "diabetic rectinopathy stage 2", "diabetic rectinopathy stage 3", "diabetic rectinopathy stage 4", "glaucoma", "cataracts"]
 file_names = []
 labels = []
 IMG_SIZE = 150
 
 #adds file name to category
 for filename in files_training:
-  if filename[22:23] == "0":
-    labels.append(0)
-    file_names.append(filename)
-  if filename[22:23] == "1":
-    labels.append(1)
-    file_names.append(filename)
-  if filename[22:23] == "2":
-    labels.append(2)
-    file_names.append(filename)
-  if filename[22:23] == "3":
-    labels.append(3)
-    file_names.append(filename)
-  if filename[22:23] == "4":
-    labels.append(4)
-    file_names.append(filename)
+    if filename[0:2] == "NL":
+        labels.append("0")
+        file_names.append(filename)
+    if filename[22:23] == "0":
+        labels.append("0")
+        file_names.append(filename)
+    if filename[22:23] == "1":
+        labels.append("1")
+        file_names.append(filename)
+    if filename[22:23] == "2":
+        labels.append("2")
+        file_names.append(filename)
+    if filename[22:23] == "3":
+        labels.append("3")
+        file_names.append(filename)
+    if filename[22:23] == "4":
+        labels.append("4")
+        file_names.append(filename)
+    if filename[0:9] == "Glaucoma":
+        labels.append("G")
+        file_names.append(filename)
+    if filename[0:3] == "cat":
+        labels.append("C")
+        file_names.append(filename)
+
+
 
 #combines matrix in a dataframe
 data = pd.DataFrame({
@@ -45,7 +56,6 @@ data = pd.DataFrame({
     'label' : labels,
 })
 
-# %%
 #plots the data being used
 #data['label'].value_counts().plot.bar()
 #print(data['label'].value_counts())
@@ -118,7 +128,7 @@ model = keras.models.Sequential([
     keras.layers.MaxPooling2D(),
     keras.layers.Flatten(),
     keras.layers.Dense(512, activation='relu'),
-    keras.layers.Dense(3), #Each output node is a score of the three classes
+    keras.layers.Dense(5), #Change to 7 when 7 outputs possible #Each output node is a score of the three classes
     keras.layers.Softmax()
 ])
 
