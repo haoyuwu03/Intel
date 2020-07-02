@@ -41,7 +41,7 @@ for filename in files_training:
     if filename[22:23] == "4":
         labels.append("4")
         file_names.append(filename)
-    if filename[0:9] == "Glaucoma":
+    if filename[0:4] == "Glau":
         labels.append("G")
         file_names.append(filename)
     if filename[0:3] == "cat":
