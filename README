@@ -3,4 +3,7 @@ Your personal eye-doctor in a box!
 Stage 1: Finish on 7/5/2020
 
 Successfully created a basic Neural Network that will be able to categorize types of diabetic rectinopathy images. (7/1)
-Up next: Add more types of diseases for the Neural Network to detect. (7/1 -> 7/2)
+Successfully added more types of diseases for the Neural Network to detect. (7/2)
+
+Stage 3: Finish on 7/16/2020
+Create Inception Model to Train our Data (7/3 -> 7/4)
