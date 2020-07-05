@@ -6,4 +6,5 @@ Successfully created a basic Neural Network that will be able to categorize type
 Successfully added more types of diseases for the Neural Network to detect. (7/2)
 
 Stage 3: Finish on 7/16/2020
-Create Inception Model to Train our Data (7/3 -> 7/4)
+Create Inception Model to Train our Data (7/3 -> 7/4) Cancelled
+Create a ResNet Model to fit our Data (7/4 -> 7/8)
