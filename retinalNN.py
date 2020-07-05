@@ -10,45 +10,28 @@ import cv2
 import csv
 import skimage.io
 
-#path to the training file
-data_directory = "C:/Users/ticto/Documents/Programming Projects/Intel/RetinopathyImages/labeled_train"
-files_training = os.listdir(data_directory)
-
-# %%
-#file name and category matrix
-categories = ["healthy eye", "diabetic rectinopathy stage 1", "diabetic rectinopathy stage 2", "diabetic rectinopathy stage 3", "diabetic rectinopathy stage 4"]
-file_names = []
-labels = []
 IMG_SIZE = 150
+#path to the training file
+data_directory = "C:/Users/ticto/.kaggle/train1"
+test_directory = "C:/Users/ticto/.kaggle/test1/test" #unused during model creation
+data_labels_df = pd.read_csv("C:/Users/ticto/.kaggle/new_train_labels.csv")
 
-#adds file name to category
-for filename in files_training:
-  if filename[22:23] == "0":
-    labels.append(0)
-    file_names.append(filename)
-  if filename[22:23] == "1":
-    labels.append(1)
-    file_names.append(filename)
-  if filename[22:23] == "2":
-    labels.append(2)
-    file_names.append(filename)
-  if filename[22:23] == "3":
-    labels.append(3)
-    file_names.append(filename)
-  if filename[22:23] == "4":
-    labels.append(4)
-    file_names.append(filename)
+#List of image filenames
+files = os.listdir(data_directory)
 
-#combines matrix in a dataframe
-data = pd.DataFrame({
-    'filename' : file_names,
-    'label' : labels,
-})
+#Ordered list of image filenames
+data_files = []
 
-# %%
-#plots the data being used
-#data['label'].value_counts().plot.bar()
-#print(data['label'].value_counts())
+#Order list of image filenames by training label dataframe
+for filename in data_labels_df["image"]:
+    name = filename + ".jpeg"
+    #try:
+    file_index = files.index(name)
+    data_files.append(files[file_index])
+    #except:
+        #train_labels_df = train_labels_df[train_labels_df.image != filename] #getting rid of training label dataframe rows of non-existant images
+
+#train_labels_df.to_csv('C:/Users/ticto/.kaggle/new_train_labels.csv') #saving updated training label dataframe
 
 #Crop image
 def crop_image_from_gray(img,tol=7):
@@ -90,21 +73,28 @@ def plotImages(images_arr):
     plt.tight_layout()
     plt.show()
 
-#Create training list of image arrays
-def create_input_data(folder_path):
-    train_data = []
-    for img in os.listdir(data_directory):
-        image = color_crop_enhance(os.path.join(data_directory,img))
-        train_data.append(image)
-    return np.array(train_data).reshape(-1, IMG_SIZE, IMG_SIZE, 3)
+#Create image array
+def create_input_data(folder_path, filename_list):
+    data = []
+    for img in filename_list:
+        image = color_crop_enhance(os.path.join(folder_path,img))
+        data.append(image)
+    return np.array(data).reshape(-1, IMG_SIZE, IMG_SIZE, 3)
 
-train_images = create_input_data(data_directory)
+#Create array of train images
+train_images = create_input_data(data_directory, data_files[0:40]) #takes too long to preprocess all the images
+
+#Create array of test images
+test_images = create_input_data(data_directory, data_files[40:50]) #takes too long to preprocess all the images
 
 #Scale pixel values
 train_images = train_images / 255.0
 
-#Create array of training labels
-train_labels = np.array(data['label'])
+#Create array of training and testing labels
+data_labels = np.array(data_labels_df['level'])
+
+train_labels = data_labels[0:40]
+test_labels = data_labels[40:50]
 
 #Build Model
 model = keras.models.Sequential([
@@ -130,7 +120,10 @@ model.compile(optimizer='adam',
 #Train Model
 model.fit(train_images, train_labels, batch_size=2, epochs=3)
 
-#ADD TEST DATA TO EVALUATE MODEL ON!!!
+#Evaluate Model on Training set
+test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
+
+print('\nTest accuracy:', test_acc)
 
 #Save Model
 model.save('firstRetinalNN.model')
