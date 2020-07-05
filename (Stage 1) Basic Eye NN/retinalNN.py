@@ -127,4 +127,3 @@ print('\nTest accuracy:', test_acc)
 
 #Save Model
 model.save('firstRetinalNN.model')
-
