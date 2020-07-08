@@ -13,7 +13,7 @@ import tensorflow as tf
 from tensorflow import keras
 
 # Load Cifar-10 data-set
-(train_im, train_lab), (test_im, test_lab) = tf.keras.datasets.cifar10.load_data()
+(train_im, train_lab), (test_im, test_lab) = tf.keras.datasets.cifar10.load_data() 
 
 #### Normalize the images to pixel values (0, 1)
 train_im, test_im = train_im/255.0 , test_im/255.0
