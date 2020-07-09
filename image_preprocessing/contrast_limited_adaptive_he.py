@@ -2,7 +2,7 @@
 
 '''
 "Contrast Limited Adaptive Histogram Equalization"
-by Karel Zuiderveld, karel@cv.ruu.nl
+by Karel Zuiderveld, karel@cv.ruu.nl 
 in "Graphics Gems IV", Academic Press, 1994
 _Author_ -- Siladittya Manna
 The below implementation does not assume that the 
