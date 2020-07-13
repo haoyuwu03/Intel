@@ -9,8 +9,9 @@ import io
 import cv2
 import csv
 import skimage.io
+import time
 
-IMG_SIZE = 150
+IMG_SIZE = 500
 #path to the training file
 data_directory = "C:/Users/ticto/.kaggle/train1"
 test_directory = "C:/Users/ticto/.kaggle/test1/test" #unused during model creation
@@ -73,19 +74,43 @@ def plotImages(images_arr):
     plt.tight_layout()
     plt.show()
 
-#Create image array
+def clahe_image(path, clip_limit=2, sigmaX=10):
+    image = cv2.imread(path)
+    image = cv2.resize(image, (IMG_SIZE, IMG_SIZE))
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+
+    #splits image into its rgb channels
+    R,G,B = cv2.split(image)
+
+    #defines the clahe cv2 function
+    clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(8,8))
+
+    R = clahe.apply(R)
+    G = clahe.apply(G)
+    B = clahe.apply(B)
+
+    image = cv2.merge((R, G, B))
+    return(image)
+
 def create_input_data(folder_path, filename_list):
     data = []
     for img in filename_list:
-        image = color_crop_enhance(os.path.join(folder_path,img))
+        image = clahe_image(os.path.join(folder_path,img))
         data.append(image)
     return np.array(data).reshape(-1, IMG_SIZE, IMG_SIZE, 3)
 
-#Create array of train images
-train_images = create_input_data(data_directory, data_files[0:40]) #takes too long to preprocess all the images
+train_size = 1000
+test_size = 300
 
+#Create array of train images
+start = time.perf_counter()
+train_images = create_input_data(data_directory, data_files[0:1]) #takes too long to preprocess all the images
+end = time.perf_counter()
+print("total:", end-start)
+
+os._exit(0)
 #Create array of test images
-test_images = create_input_data(data_directory, data_files[40:50]) #takes too long to preprocess all the images
+test_images = create_input_data(data_directory, data_files[train_size:train_size+test_size]) #takes too long to preprocess all the images
 
 #Scale pixel values
 train_images = train_images / 255.0
@@ -93,8 +118,12 @@ train_images = train_images / 255.0
 #Create array of training and testing labels
 data_labels = np.array(data_labels_df['level'])
 
-train_labels = data_labels[0:40]
-test_labels = data_labels[40:50]
+train_labels = data_labels[0:train_size]
+test_labels = data_labels[train_size:train_size+test_size]
+
+print(len(train_labels), len(train_images))
+print(len(test_labels), len(test_images))
+os._exit(0)
 
 #Build Model
 model = keras.models.Sequential([
@@ -126,7 +155,7 @@ test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
 print('\nTest accuracy:', test_acc)
 
 #Save Model
-model.save('firstRetinalNN.model')
+#model.save('firstRetinalNN.model')
 
 os._exit(0)
 
