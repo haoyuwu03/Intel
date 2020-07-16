@@ -99,31 +99,45 @@ def create_input_data(folder_path, filename_list):
         data.append(image)
     return np.array(data).reshape(-1, IMG_SIZE, IMG_SIZE, 3)
 
-train_size = 1000
-test_size = 300
+#Values
+train_size = 500
+val_size = 100
+batch_size = 10
+eopchs = 10
 
 #Create array of train images
-start = time.perf_counter()
-train_images = create_input_data(data_directory, data_files[0:1]) #takes too long to preprocess all the images
-end = time.perf_counter()
-print("total:", end-start)
+train_images = create_input_data(data_directory, data_files[0:train_size]) #takes too long to preprocess all the images
 
-os._exit(0)
-#Create array of test images
-test_images = create_input_data(data_directory, data_files[train_size:train_size+test_size]) #takes too long to preprocess all the images
+#Create array of validation images
+val_images = create_input_data(data_directory, data_files[train_size:train_size+val_size]) #takes too long to preprocess all the images
 
 #Scale pixel values
 train_images = train_images / 255.0
+val_images = val_images / 255.0
 
 #Create array of training and testing labels
 data_labels = np.array(data_labels_df['level'])
 
 train_labels = data_labels[0:train_size]
-test_labels = data_labels[train_size:train_size+test_size]
+val_labels = data_labels[train_size:train_size+val_size]
 
-print(len(train_labels), len(train_images))
-print(len(test_labels), len(test_images))
-os._exit(0)
+#Create ImageDataGenerator for real-time augmentation
+train_DataGen = tf.keras.preprocessing.image.ImageDataGenerator(zoom_range=0.2, 
+                                                                width_shift_range=0.1, 
+                                                                height_shift_range = 0.1, 
+                                                                horizontal_flip=True,
+                                                                vertical_flip=True,
+                                                                rotation_range=100)
+val_DataGen = tf.keras.preprocessing.image.ImageDataGenerator(zoom_range=0.2, 
+                                                                width_shift_range=0.1, 
+                                                                height_shift_range = 0.1, 
+                                                                horizontal_flip=True,
+                                                                vertical_flip=True,
+                                                                rotation_range=100)
+
+#Pass images and labels into ImageDataGenerator
+train_data = train_DataGen.flow(train_images, train_labels, batch_size=batch_size) 
+val_data = val_DataGen.flow(val_images, val_labels, batch_size=batch_size) 
 
 #Build Model
 model = keras.models.Sequential([
@@ -147,15 +161,43 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 #Train Model
-model.fit(train_images, train_labels, batch_size=2, epochs=3)
+#model.fit(train_images, train_labels, batch_size=2, epochs=3)
 
-#Evaluate Model on Training set
-test_loss, test_acc = model.evaluate(test_images,  test_labels, verbose=2)
+#Train Model
+history = model.fit_generator(
+    train_data,
+    steps_per_epoch=train_size // batch_size,
+    epochs=epochs,
+    validation_data=val_data,
+    validation_steps=val_size // batch_size
+)
 
-print('\nTest accuracy:', test_acc)
+#View Results
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+
+loss=history.history['loss']
+val_loss=history.history['val_loss']
+
+epochs_range = range(epochs)
+
+plt.figure(figsize=(8, 8))
+
+plt.subplot(1, 2, 1)
+plt.plot(epochs_range, acc, label='Training Accuracy')
+plt.plot(epochs_range, val_acc, label='Validation Accuracy')
+plt.legend(loc='lower right')
+plt.title('Training and Validation Accuracy')
+
+plt.subplot(1, 2, 2)
+plt.plot(epochs_range, loss, label='Training Loss')
+plt.plot(epochs_range, val_loss, label='Validation Loss')
+plt.legend(loc='upper right')
+plt.title('Training and Validation Loss')
+plt.show()
 
 #Save Model
-#model.save('firstRetinalNN.model')
+model.save('augmentedRetinalImagesNN.model')
 
 os._exit(0)
 
