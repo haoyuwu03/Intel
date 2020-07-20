@@ -50,7 +50,7 @@ def rotation(img, angle):
 #function for augmenting images, 4x more images
 def augment_images(image_array, image_labels):
   unaugmented_images = image_array
-  old_labels = image_array
+  old_labels = image_labels
   augmented_images = []
   augmented_labels = []
 
