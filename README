@@ -12,7 +12,8 @@ Successfully added more types of diseases for the Neural Network to detect. (7/2
 ----------------------------------------
 Stage 2: Finished on 7/22/2020
 
-The objective of stage 2 was to create a more complex classifier utilizing the a residual network. We were able to achieve a training accuracy of 99.4% and a testing accuracy of 85%.
-In stage 2 we were able to categorize the following diseases: cataracts, glaucoma, and the stage of diabetic retinopathy. We plan to add hypertensive retinopathy as more data becomes available.
+The objective of stage 2 was to create a more complex classifier utilizing the a residual network. We were able to achieve a 
+training accuracy of 99.4% and a testing accuracy of 85%. In stage 2 we were able to categorize the following diseases: cataracts, 
+glaucoma, and the stages of diabetic retinopathy. We plan to add hypertensive retinopathy as more data becomes available.
 
 Successfully created and tested the Res-Net 18 model. (7/16 -> 7/22)
