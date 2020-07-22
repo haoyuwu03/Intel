@@ -10,6 +10,7 @@ Successfully created a basic Neural Network that will be able to categorize type
 Successfully added more types of diseases for the Neural Network to detect. (7/2)
 
 ----------------------------------------
+
 Stage 2: Finished on 7/22/2020
 
 The objective of stage 2 was to create a more complex classifier utilizing the a residual network. We were able to achieve a 
