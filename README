@@ -17,4 +17,8 @@ The objective of stage 2 was to create a more complex classifier utilizing a res
 training accuracy of 99.4% and a testing accuracy of 85%. In stage 2 we were able to categorize the following diseases: cataracts, 
 glaucoma, and the stages of diabetic retinopathy. We plan to add hypertensive retinopathy as more data becomes available.
 
+When using our stage 2 code, first put in images into the image_preprocessing.py
+Then use the output and put the arrays into the resnet18_fundus_classifier.py
+data_aug_expansion.py is only used to increase sample size for training.
+
 Successfully created and tested the Res-Net 18 model. (7/16 -> 7/22)
