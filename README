@@ -22,3 +22,13 @@ Then use the output and put the arrays into the resnet18_fundus_classifier.py
 data_aug_expansion.py is only used to increase sample size for training.
 
 Successfully created and tested the Res-Net 18 model. (7/16 -> 7/22)
+
+----------------------------------------
+
+Stage 3: Finish by August 15
+
+The objective of stage 2 is to create a object detection classifier that will look for specific symptoms related to various diseases.
+These diseases include Age Related Macular Degeneration, Glaucoma, Diabetic Retinopathy, Cataracts and others. Symptoms that will be detectable will include
+but not be limited to: drusen, epiteral membrane, venous beading and others.
+
+We will be using the YOLOv3 X Darknet53 design due to its high calculating speed and accuracy.
