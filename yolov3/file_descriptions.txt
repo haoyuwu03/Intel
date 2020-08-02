@@ -1,0 +1,40 @@
+yolov3_training:
+- configs.py
+	defines variables
+
+- dataset.py
+	load_annotations(self, datset_type)
+	delete_bad_annotation(self, bad_annotation)
+	random_horizontal_flip(self, image, bboxes)
+	random_crop(self, image, bboxes)
+	random_translate(self, image, bboxes)
+	parse_annotations(self, annotation)
+	preprocess_true_boxes(self, bboxes)
+
+- utils.py
+	load_yolo_weights(model, weights_file)
+	read_class_names(class_file_name)
+	image_preprocess(image, target_size)
+	draw_bbox(image, bboxes)
+	bboxes_iou(boxes1, boxes2)
+	nms(bboxes, iou_threshold)
+	postprocess_boxes(pred_bbox, original_image, input_size, scpre_threshold)
+	detect_image(YoloV3, image_path, output_path, colab)
+	detect_video(YoloV3, video_path)
+	detect_realtime(YoloV3, output_path)
+
+- yolov3.py
+	BatchNormalization(BatchNormalization)
+	convolutional(input_layerm filters_shape)
+	residual_block(input_layer, input_channel, filter_num1, filter_num2)
+	upsample(input_layer)
+	darknet53(input_data)
+	yolov3(input_layer, NUM_CLASS)
+	create_yolov3()
+	decode(conv_output, NUM_CLASS)
+	bbox_iou(boxes1, boxes2)
+	bbox_giou(boxes1, boxes2)
+	compute_loss(pred, conv, label, bboxes)
+	
+
+	
